@@ -1,0 +1,88 @@
+https://www.javatpoint.com/sql-server-merge
+
+
+Syntax
+
+The following are the syntax that illustrates the MERGE statement in SQL Server:
+
+MERGE target_table USING source_table  
+ON merge_condition  
+WHEN MATCHED  
+THEN update_statement  
+WHEN NOT MATCHED  
+THEN insert_statement  
+WHEN NOT MATCHED BY SOURCE  
+THEN DELETE;  
+        
+        
+
+//TABLE pRODUCTS
+CREATE TABLE Products(  
+ID INT,  
+Product_Name VARCHAR(65),  
+Price DECIMAL(9,2)  
+)  
+
+INSERT INTO Products(ID, Product_Name, Price) VALUES   
+(1, 'Table', 150), (2, 'Desk', 100),  
+(3, 'Chair', 75), (4, 'Computer', 225);  
+
+DROP TABLE PRODUCTS;
+DROP TABLE TARGETPRODUCTS;
+
+
+
+CREATE TABLE TargetProducts(  
+ID INT,  
+Product_Name VARCHAR(65),  
+Price DECIMAL(9,2)  
+)  
+
+INSERT INTO TargetProducts(ID, Product_Name, Price) VALUES  
+(1, 'Table', 150),  
+(2, 'Desk', 150),  
+(5, 'Bed', 100),  
+(6, 'Cupboard', 350);  
+
+SELECT * FROM Products  
+SELECT * FROM TargetProducts  
+
+//MERGE 1
+MERGE TargetProducts AS Target  
+USING Products  AS Source  
+ON Source.ID = Target.ID  
+WHEN NOT MATCHED BY Target THEN  
+INSERT (ID, Product_Name, Price)   
+VALUES (Source.ID, Source.Product_Name, Source.Price);  
+
+
+
+//MERGE2
+
+MERGE TargetProducts AS Target  
+USING Products AS Source  
+ON Source.ID = Target.ID  
+WHEN NOT MATCHED BY Target THEN  
+-- It will insert records  
+INSERT (ID, Product_Name, Price)   
+VALUES (Source.ID, Source.Product_Name, Source.Price)  
+-- It will update records  
+WHEN MATCHED THEN UPDATE SET  
+Target.Product_Name = Source.Product_Name,  
+Target.Price = Source.Price;  
+
+//MERGE3
+MERGE TargetProducts AS Target  
+USING Products  AS Source  
+ON Source.ID = Target.ID  
+-- It will insert records  
+WHEN NOT MATCHED BY Target THEN  
+INSERT (ID, Product_Name, Price)   
+VALUES (Source.ID, Source.Product_Name, Source.Price)  
+-- It will update records  
+WHEN MATCHED THEN UPDATE SET  
+Target.Product_Name = Source.Product_Name,  
+Target.Price = Source.Price  
+-- It will delete records  
+WHEN NOT MATCHED BY Source THEN  
+DELETE;  
